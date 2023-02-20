@@ -24,7 +24,7 @@ class AppFixtures extends Fixture
     {
         // $product = new Product();
         // $manager->persist($product);
-        $faker = Factory::create('fr_FR');
+       /* $faker = Factory::create('fr_FR');
         
         for($u=0; $u<10;$u++){
             $user = new User();
@@ -57,6 +57,6 @@ class AppFixtures extends Fixture
         }
   
 
-        $manager->flush();
+        $manager->flush();*/
     }
 }
