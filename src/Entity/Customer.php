@@ -22,31 +22,47 @@ class Customer
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['customers_read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['customers_read'])]
+    #[Groups(['customers_read','invoices_read'])]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['customers_read','invoices_read'])]
     private ?string $lastName = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['customers_read','invoices_read'])]
     private ?string $email = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['customers_read','invoices_read'])]
     private ?string $company = null;
 
     #[ORM\OneToMany(mappedBy: 'customer', targetEntity: Invoice::class, orphanRemoval: true)]
+    #[Groups(['customers_read'])]
     private Collection $invoices;
 
     #[ORM\ManyToOne(inversedBy: 'customers')]
+    #[Groups(['customers_read'])]
     private ?User $user = null;
 
     public function __construct()
     {
         $this->invoices = new ArrayCollection();
+    }
+    #[Groups(['customers_read'])]
+    public function getTotalAmount(): float{
+        return array_reduce($this->invoices->toArray(), function($total,$invoice){
+            return $total + $invoice->getAmount();
+        },0);
+    }
+    #[Groups(['customers_read'])]
+    public function getUnpaidAmount(): float{
+        return array_reduce($this->invoices->toArray(), function($total,$invoice){
+            return $total+ ($invoice->getStatus()==="PAID" || $invoice->getStatus() === "CANCELLED" ? 0 :$invoice->getAmount());
+        },0);
     }
 
     public function getId(): ?int

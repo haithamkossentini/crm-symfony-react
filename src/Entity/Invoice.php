@@ -9,9 +9,14 @@ use ApiPlatform\Metadata\ApiResource;
 use App\Repository\InvoiceRepository;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Paginator;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: InvoiceRepository::class)]
-#[ApiResource(paginationEnabled: false, order: ['sentAt' => 'DESC'])]
+#[ApiResource(
+    paginationEnabled: false,
+    order: ['sentAt' => 'DESC'],
+    normalizationContext: ['groups' => ['invoices_read']]
+)]
 #[ApiFilter(OrderFilter::class)]
 class Invoice
 {
@@ -21,21 +26,31 @@ class Invoice
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Groups(['invoices_read','customers_read'])]
     private ?float $amount = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(['invoices_read','customers_read'])]
     private ?\DateTimeInterface $sentAt = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['invoices_read','customers_read'])]
     private ?string $status = null;
 
+        // #[Groups(['invoices_read','customers_read'])]
     #[ORM\ManyToOne(inversedBy: 'invoices')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?customer $customer = null;
+    #[Groups(['invoices_read','customers_read'])]
+    private ?Customer $customer = null;
 
     #[ORM\Column]
+    #[Groups(['invoices_read','customers_read'])]
     private ?int $chrono = null;
 
+    #[Groups(['invoices_read'])]
+    public function getUser(): User {
+        return $this->customer->getUser();
+    }
     public function getId(): ?int
     {
         return $this->id;
