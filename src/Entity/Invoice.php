@@ -19,7 +19,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: InvoiceRepository::class)]
 #[ApiResource(
-    //operations:[new GetCollection(),new Post()],
     operations:[new GetCollection(),new Post(),new Get(), new Put(),new Delete(),    new Post(name: 'increment', routeName: 'increment'),],
     paginationEnabled: false,
     order: ['sentAt' => 'DESC'],

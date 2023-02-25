@@ -21,28 +21,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CustomerRepository::class)]
 #[ApiResource(    
-    /***si je veux préciser l'url dans ai plateforme je decommente cette ligne grâce a uriTemplate */
-    /* operations:[new GetCollection( uriTemplate: '/clients'),new Post(),new Get(uriTemplate: '/clients/{id}'), new Put(),new Delete()],*/
      operations:[new GetCollection(),new Post(),new Get(), new Put(),new Delete()],
      normalizationContext: ['groups' => ['customers_read']]
     )]
-   /* #[ApiResource(
-        uriTemplate: '/customers/{id}/invoices', 
-        uriVariables: [
-            //'id' => new Link( fromClass: Customer::class),
-            'invoices' => new Link(fromClass: Invoice::class, toProperty: 'invoices'),
 
-        ], 
-        operations: [new GetCollection()]
-    )]*/
-   /* #[ApiResource(
-        uriTemplate: "/customers/{id}/invoices",
-        operations: [new GetCollection()],
-        uriVariables: ['id' => new Link(fromClass: Invoice::class,fromProperty: 'customer' )]
-    )]*/
 #[ApiFilter(SearchFilter::class)]
 #[ApiFilter(OrderFilter::class)]
-// #[ApiFilter(SearchFilter::class, properties: ['firstName', 'lastName', 'company'])]
 class Customer
 {
     #[ORM\Id]
