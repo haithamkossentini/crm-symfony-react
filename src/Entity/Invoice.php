@@ -2,20 +2,39 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\Post;
 use Doctrine\DBAL\Types\Types;
+use ApiPlatform\Metadata\Delete;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\InvoiceRepository;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Paginator;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: InvoiceRepository::class)]
 #[ApiResource(
+    //operations:[new GetCollection(),new Post()],
+    operations:[new GetCollection(),new Post(),new Get(), new Put(),new Delete(),    new Post(name: 'increment', routeName: 'increment'),],
     paginationEnabled: false,
     order: ['sentAt' => 'DESC'],
     normalizationContext: ['groups' => ['invoices_read']]
+)]
+
+#[ApiResource(
+    uriTemplate: '/customers/{id}/invoices', 
+    uriVariables: [
+        'id' => new Link(
+            fromClass: Customer::class,
+            fromProperty: 'invoices'
+        )
+    ], 
+    operations: [new GetCollection()]
 )]
 #[ApiFilter(OrderFilter::class)]
 class Invoice

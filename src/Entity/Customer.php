@@ -2,18 +2,44 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Delete;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\CustomerRepository;
+use ApiPlatform\Metadata\GetCollection;
 use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use Doctrine\Common\Collections\ArrayCollection;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CustomerRepository::class)]
-#[ApiResource(normalizationContext: ['groups' => ['customers_read']])]
+#[ApiResource(    
+    /***si je veux préciser l'url dans ai plateforme je decommente cette ligne grâce a uriTemplate */
+    /* operations:[new GetCollection( uriTemplate: '/clients'),new Post(),new Get(uriTemplate: '/clients/{id}'), new Put(),new Delete()],*/
+     operations:[new GetCollection(),new Post(),new Get(), new Put(),new Delete()],
+     normalizationContext: ['groups' => ['customers_read']]
+    )]
+   /* #[ApiResource(
+        uriTemplate: '/customers/{id}/invoices', 
+        uriVariables: [
+            //'id' => new Link( fromClass: Customer::class),
+            'invoices' => new Link(fromClass: Invoice::class, toProperty: 'invoices'),
+
+        ], 
+        operations: [new GetCollection()]
+    )]*/
+   /* #[ApiResource(
+        uriTemplate: "/customers/{id}/invoices",
+        operations: [new GetCollection()],
+        uriVariables: ['id' => new Link(fromClass: Invoice::class,fromProperty: 'customer' )]
+    )]*/
 #[ApiFilter(SearchFilter::class)]
 #[ApiFilter(OrderFilter::class)]
 // #[ApiFilter(SearchFilter::class, properties: ['firstName', 'lastName', 'company'])]
