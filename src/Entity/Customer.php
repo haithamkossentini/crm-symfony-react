@@ -36,14 +36,20 @@ class Customer
 
     #[ORM\Column(length: 255)]
     #[Groups(['customers_read','invoices_read'])]
+    #[Assert\NotBlank(message:"Le prénom du customer est obligatoire")]
+    #[Assert\Length(min:3 , minMessage:"Le prénom doit faire entre 3 et 255 caractères",max:255,maxMessage:"Le prénom doit faire entre 3 et 255 caractères")]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255)]
     #[Groups(['customers_read','invoices_read'])]
+    #[Assert\NotBlank(message:"Le nom de famille du customer est obligatoire")]
+    #[Assert\Length(min:3 , minMessage:"Le nom de famille doit faire entre 3 et 255 caractères",max:255,maxMessage:"Le de famille doit faire entre 3 et 255 caractères")]
     private ?string $lastName = null;
 
     #[ORM\Column(length: 255)]
     #[Groups(['customers_read','invoices_read'])]
+    #[Assert\NotBlank(message:"L'adresse email du customer est obligatoire")]
+    #[Assert\Email(message: "Le format de l'adresse email doit être valide")]
     private ?string $email = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -56,6 +62,7 @@ class Customer
 
     #[ORM\ManyToOne(inversedBy: 'customers')]
     #[Groups(['customers_read'])]
+    #[Assert\NotBlank(message:"L'utilisateur est obligatoire")]
     private ?User $user = null;
 
     public function __construct()

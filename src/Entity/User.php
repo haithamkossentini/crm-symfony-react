@@ -10,9 +10,12 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ApiResource(normalizationContext: ['groups' => ['users_read']])]
+#[UniqueEntity("email",message:"Un utilisateur ayant cette adresse email existe déja")]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -23,6 +26,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 180, unique: true)]
     #[Groups(['customers_read','invoices_read'])]
+    #[Assert\NotBlank(message:"L'adresse email du user est obligatoire")]
+    #[Assert\Email(message: "Le format de l'adresse email doit être valide")]
     private ?string $email = null;
 
     #[ORM\Column]
@@ -32,12 +37,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     #[ORM\Column]
+    #[Assert\NotBlank(message:"Le mot de passe est obligatoire")]
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message:"Le prénom du customer est obligatoire")]
+    #[Assert\Length(min:3 , minMessage:"Le prénom doit faire entre 3 et 255 caractères",max:255,maxMessage:"Le prénom doit faire entre 3 et 255 caractères")]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message:"Le nom de famille du customer est obligatoire")]
+    #[Assert\Length(min:3 , minMessage:"Le nom de famille doit faire entre 3 et 255 caractères",max:255,maxMessage:"Le de famille doit faire entre 3 et 255 caractères")]
     private ?string $lastName = null;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Customer::class)]

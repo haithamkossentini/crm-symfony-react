@@ -16,13 +16,15 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Paginator;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: InvoiceRepository::class)]
 #[ApiResource(
     operations:[new GetCollection(),new Post(),new Get(), new Put(),new Delete(),    new Post(name: 'increment', routeName: 'increment'),],
     paginationEnabled: false,
     order: ['sentAt' => 'DESC'],
-    normalizationContext: ['groups' => ['invoices_read']]
+    normalizationContext: ['groups' => ['invoices_read']],
+    denormalizationContext: ['disable_type_enforcement'=>'true']
 )]
 
 #[ApiResource(
@@ -45,25 +47,36 @@ class Invoice
 
     #[ORM\Column]
     #[Groups(['invoices_read','customers_read'])]
-    private ?float $amount = null;
+    #[Assert\NotBlank(message:"Le montant de la facture est obligatoire")]
+    #[Assert\Type(type:"numeric" ,message:"Le montant de la facture  doit être numérique")]
+    private  $amount = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Groups(['invoices_read','customers_read'])]
+      // #[Assert\Type(type:"\DateTimeInterface",message:"la date doit être au format YYYY-MM-DD")]
+    // #[Assert\DateTime(message:"la date doit être valide")]
+    #[Assert\Type(type:"\DateTimeInterface",message:"la date doit être au format YYYY-MM-DD")]
+    #[Assert\NotBlank(message:"La date d'envoie doit être renseignée")]
     private ?\DateTimeInterface $sentAt = null;
 
     #[ORM\Column(length: 255)]
     #[Groups(['invoices_read','customers_read'])]
+    #[Assert\NotBlank(message:"Le statut de la facture est obligatoire")]
+    #[Assert\Choice(choices:["SENT","PAID","CANCELLED"],message:"Le statut doit être SENT , PAID , ou CANCELLED")]
     private ?string $status = null;
 
         // #[Groups(['invoices_read','customers_read'])]
     #[ORM\ManyToOne(inversedBy: 'invoices')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['invoices_read','customers_read'])]
+    #[Assert\NotBlank(message:"Le client de la facture doit être renseignée")]
     private ?Customer $customer = null;
 
     #[ORM\Column]
     #[Groups(['invoices_read','customers_read'])]
-    private ?int $chrono = null;
+    #[Assert\NotBlank(message:"Il faut absolument un chrono pour la facture")]
+    #[Assert\Type(type:"integer",message:"Le chrono doit être un nombre !")]
+    private  $chrono = null;
 
     #[Groups(['invoices_read'])]
     public function getUser(): User {
@@ -79,7 +92,7 @@ class Invoice
         return $this->amount;
     }
 
-    public function setAmount(float $amount): self
+    public function setAmount($amount): self
     {
         $this->amount = $amount;
 
@@ -127,7 +140,7 @@ class Invoice
         return $this->chrono;
     }
 
-    public function setChrono(int $chrono): self
+    public function setChrono( $chrono): self
     {
         $this->chrono = $chrono;
 
