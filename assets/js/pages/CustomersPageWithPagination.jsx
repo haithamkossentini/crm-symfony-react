@@ -1,83 +1,54 @@
 import React, { useEffect, useState } from 'react'
+import axios from 'axios'
 import Pagination from '../components/Pagination'
-import CustomersAPI from '../services/customersAPI'
-const CustomersPage = (propos) => {
+const CustomersPageWithPagination = (propos) => {
   const [customers, setCustomers] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
-  const [search, setSearch] = useState('')
+  const [totalItems, setTotalItems] = useState(0)
+  const [loading, setLoading] = useState(true);
+  const itemsPerPage = 8
 
-  //Permet d'aller récupérer les customers
-  const fetchCustomers = async () => {
-    try {
-      const data = await CustomersAPI.findAll()
-      setCustomers(data)
-    } catch (error) {
-      console.log(error.response)
-    }
-  }
-
-  //Au chargement du composant, on va chercher les customers
   useEffect(() => {
-    fetchCustomers()
-  }, [])
+    axios
+      .get(
+        `https://localhost:8000/api/customers?pagination=true&count=${itemsPerPage}&page=${currentPage}`
+      )
+      .then((response) => {
+        setCustomers(response.data['hydra:member'])
+        setTotalItems(response.data['hydra:totalItems'])
+        setLoading(false)
+      })
+      .catch((error) => console.log(error.response))
+  }, [currentPage])
 
-  //Gesion de la suppression d'un customer
-  const handleDelete = async (id) => {
+  const handleDelete = (id) => {
     const originalCustomers = [...customers]
     //approche optimiste
     setCustomers(
       customers.filter((customer) => customer['@id'].split('/').pop() !== id)
     )
-    try {
-      await CustomersAPI.delete(id)
-    } catch (error) {
-      setCustomers(originalCustomers)
-    }
-    //2eme façon de faire une requête
-    /* CustomersAPI.delete(id)
+    axios
+      .delete('https://localhost:8000/api/customers/' + id)
       .then((response) => console.log('ok'))
       .catch((error) => {
         setCustomers(originalCustomers)
         console.log(error.response)
-      })*/
-  }
-  //Gestion du changement de page
-  const handlePageChange = (page) => setCurrentPage(page)
-  //Gestion de la recherche
-  const handleSearch = ({ currentTarget }) => {
-    setSearch(currentTarget.value)
-    setCurrentPage(1)
+      })
   }
 
-  const itemsPerPage = 8
+  const handlePageChange = (page) => {
+    setLoading(true)
+    setCurrentPage(page)
+  }
 
-  // Filtrage des customers en fonction de la recherche
-  const filteredCustomers = customers.filter(
-    (c) =>
-      c.firstName.toLowerCase().includes(search.toLowerCase()) ||
-      c.lastName.toLowerCase().includes(search.toLowerCase()) ||
-      c.email.toLowerCase().includes(search.toLowerCase()) ||
-      (c.company && c.company.toLowerCase().includes(search.toLowerCase()))
-  )
-
-  // Pagination des données
   const paginatedCustomers = Pagination.getData(
-    filteredCustomers,
+    customers,
     currentPage,
     itemsPerPage
   )
   return (
     <>
-      <h1>Liste des clients</h1>
-      <div className='form-group'>
-        <input
-          type='text'
-          onChange={handleSearch}
-          value={search}
-          className='form-control'
-          placehoder='Rechercher ...'
-        />
-      </div>
+      <h1>Liste des clients pagination</h1>
       <table className='table table-hover'>
         <thead>
           <tr>
@@ -91,7 +62,13 @@ const CustomersPage = (propos) => {
           </tr>
         </thead>
         <tbody>
-          {paginatedCustomers.map((customer) => (
+            {loading   && (
+                <tr>
+                    <td>Chargement ...</td>
+                </tr>
+            )}
+          {! loading && 
+          customers.map((customer) => (
             <tr key={customer['@id'].split('/').pop()}>
               <td>{customer['@id'].split('/').pop()}</td>
               <td>
@@ -123,16 +100,14 @@ const CustomersPage = (propos) => {
           ))}
         </tbody>
       </table>
-      {itemsPerPage < filteredCustomers.length && (
-        <Pagination
-          currentPage={currentPage}
-          itemsPerPage={itemsPerPage}
-          length={filteredCustomers.length}
-          onPageChanged={handlePageChange}
-        ></Pagination>
-      )}
+      <Pagination
+        currentPage={currentPage}
+        itemsPerPage={itemsPerPage}
+        length={totalItems}
+        onPageChanged={handlePageChange}
+      ></Pagination>
     </>
   )
 }
 
-export default CustomersPage
+export default CustomersPageWithPagination

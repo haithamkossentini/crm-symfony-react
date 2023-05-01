@@ -22,6 +22,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: CustomerRepository::class)]
 #[ApiResource(    
      operations:[new GetCollection(),new Post(),new Get(), new Put(),new Delete()],
+     //paginationEnabled: true,
      normalizationContext: ['groups' => ['customers_read']]
     )]
 

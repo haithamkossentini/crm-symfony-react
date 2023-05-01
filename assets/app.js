@@ -6,27 +6,32 @@
  */
 
 // any CSS you import will output into a single css file (app.css in this case)
-import './styles/app.css';
-import React from 'react';
-import ReactDOM from 'react-dom';
-import { HashRouter , Switch , Route } from 'react-router-dom';
+import './styles/app.css'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import { HashRouter, Switch, Route } from 'react-router-dom'
 //start the Stimulus application
-import './bootstrap';
-import Navbar from './js/components/Navbar';
-import HomePage from './js/pages/HomePage';
-import CustomersPage from './js/pages/CustomerPage';
-console.log("hello");
+import './bootstrap'
+import Navbar from './js/components/Navbar'
+import HomePage from './js/pages/HomePage'
+import CustomersPage from './js/pages/CustomerPage'
+import CustomersPageWithPagination from './js/pages/CustomersPageWithPagination'
+import InvoicesPage from './js/pages/InvoicesPage'
+console.log('hello')
 
-const App= () => {
-    return <HashRouter>
-        <Navbar />
-        <main className="container pt-5">
-            <Switch>
-                <Route path="/customers" component={CustomersPage}></Route>
-                <Route path="/" component={HomePage}></Route>
-            </Switch>
-        </main>
+const App = () => {
+  return (
+    <HashRouter>
+      <Navbar />
+      <main className='container pt-5'>
+        <Switch>
+          <Route path='/invoices' component={InvoicesPage}></Route>
+          <Route path='/customers' component={CustomersPage}></Route>
+          <Route path='/' component={HomePage}></Route>
+        </Switch>
+      </main>
     </HashRouter>
-};
-const rootElement = document.querySelector('#app');
-ReactDOM.render(<App/>, rootElement);
+  )
+}
+const rootElement = document.querySelector('#app')
+ReactDOM.render(<App />, rootElement)

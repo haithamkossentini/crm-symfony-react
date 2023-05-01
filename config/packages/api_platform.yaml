@@ -8,3 +8,17 @@ api_platform:
       items_per_page_parameter_name: 'count'
       page_parameter_name: 'page'
       partial_parameter_name: 'partial'
+# for CustomersPageWithPagination
+#api_platform:
+# defaults:
+#     pagination_items_per_page: 8 # Default value
+# mapping:
+#   paths: ['%kernel.project_dir%/src/Entity']
+# collection:
+#   pagination:
+#     enabled: true
+#     enabled_parameter_name: 'pagination'
+#     items_per_page_parameter_name: 'count'
+#     page_parameter_name: 'page'
+#partial_parameter_name: 'partial'
+
