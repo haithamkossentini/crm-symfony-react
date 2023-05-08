@@ -6,31 +6,52 @@
  */
 
 // any CSS you import will output into a single css file (app.css in this case)
-import './styles/app.css'
-import React from 'react'
+import React, { useState } from 'react'
 import ReactDOM from 'react-dom'
-import { HashRouter, Switch, Route } from 'react-router-dom'
+import {
+  HashRouter,
+  Route,
+  Switch,
+  withRouter
+} from 'react-router-dom'
+import './styles/app.css'
 //start the Stimulus application
 import './bootstrap'
 import Navbar from './js/components/Navbar'
-import HomePage from './js/pages/HomePage'
+import PrivateRoute from './js/components/PrivateRoute'
+import AuthContext from './js/contexts/AuthContext'
 import CustomersPage from './js/pages/CustomerPage'
-import CustomersPageWithPagination from './js/pages/CustomersPageWithPagination'
+import HomePage from './js/pages/HomePage'
 import InvoicesPage from './js/pages/InvoicesPage'
-console.log('hello')
+import LoginPage from './js/pages/LoginPage'
+import AuthAPI from './js/services/authAPI'
+
+AuthAPI.setup()
 
 const App = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    AuthAPI.isAuthenticated()
+  )
+  const NavbarWithRouter = withRouter(Navbar)
+  console.log(isAuthenticated)
+
   return (
-    <HashRouter>
-      <Navbar />
-      <main className='container pt-5'>
-        <Switch>
-          <Route path='/invoices' component={InvoicesPage}></Route>
-          <Route path='/customers' component={CustomersPage}></Route>
-          <Route path='/' component={HomePage}></Route>
-        </Switch>
-      </main>
-    </HashRouter>
+    <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated }}>
+      <HashRouter>
+        <NavbarWithRouter />
+        <main className='container pt-5'>
+          <Switch>
+            <Route path='/login' component={LoginPage} />
+
+            <PrivateRoute path='/invoices' component={InvoicesPage} />
+
+            <PrivateRoute path='/customers' component={CustomersPage} />
+
+            <Route path='/' component={HomePage}></Route>
+          </Switch>
+        </main>
+      </HashRouter>
+    </AuthContext.Provider>
   )
 }
 const rootElement = document.querySelector('#app')
