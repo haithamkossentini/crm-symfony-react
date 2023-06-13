@@ -19,20 +19,17 @@ function update(id, invoice) {
 function create(invoice) {
   axios.post('https://localhost:8000/api/invoices', invoice)
 }
-function update2(id, invoice){
- return  axios.put(
-    'https://localhost:8000/api/invoices/' + id,
-    { ...invoice, customer: `/api/customers/${invoice.customer}` }
-  )
+function update2(id, invoice) {
+  return axios.put('https://localhost:8000/api/invoices/' + id, {
+    ...invoice,
+    customer: `/api/customers/${invoice.customer}`,
+  })
 }
-function create2(invoice){
- return  axios.post(
-    'https://localhost:8000/api/invoices',
-    {
-      ...invoice,
-      customer: `/api/customers/${invoice.customer}`,
-    }
-  )
+function create2(invoice) {
+  return axios.post('https://localhost:8000/api/invoices', {
+    ...invoice,
+    customer: `/api/customers/${invoice.customer}`,
+  })
 }
 export default {
   findAll,

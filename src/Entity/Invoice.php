@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: InvoiceRepository::class)]
 #[ApiResource(
     operations:[new GetCollection(),new Post(),new Get(), new Put(),new Delete(),    new Post(name: 'increment', routeName: 'increment'),],
-    paginationEnabled: false,
+   // paginationEnabled: false,
     order: ['sentAt' => 'DESC'],
     normalizationContext: ['groups' => ['invoices_read']],
     denormalizationContext: ['disable_type_enforcement'=>'true']

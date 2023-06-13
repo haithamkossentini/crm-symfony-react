@@ -29,6 +29,9 @@ const LoginPage = ({ onLogin, history }) => {
       history.replace('/customers')
     } catch (error) {
       setError('Les informations ne correspondent pas')
+      toast.error('Une erreur est survenue')
+
+
     }
   }
   return (

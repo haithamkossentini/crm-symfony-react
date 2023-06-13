@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react'
 import Pagination from '../components/Pagination'
 import invoicesAPI from '../services/invoicesAPI'
 import { Link } from 'react-router-dom'
+import { toast } from 'react-toastify'
+import TableLoader from '../components/loaders/TableLoader'
 
 const STATUS_CLASSES = {
   PAID: 'success',
@@ -18,14 +20,17 @@ const InvoicesPage = (props) => {
   const [invoices, setInvoices] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
   const [search, setSearch] = useState('')
+  const [loading, setLoading] = useState(true)
   const itemsPerPage = 8
 
   const fetchInvoices = async () => {
     try {
       const data = await invoicesAPI.findAll()
       setInvoices(data)
+      setLoading(false)
+
     } catch (error) {
-      console.log(error.response)
+      toast.error('Erreur lors du chargement des factures !')
     }
   }
   useEffect(() => {
@@ -49,8 +54,10 @@ const InvoicesPage = (props) => {
     )
     try {
       await invoicesAPI.delete(id)
+      toast.success('La facture a bien été supprimée')
     } catch (error) {
       setInvoices(originalInvoices)
+      toast.error('Une erreur est survenue')
     }
   }
   //Gestion Format date
@@ -99,15 +106,16 @@ const InvoicesPage = (props) => {
             <th></th>
           </tr>
         </thead>
-        <tbody>
+        {!loading &&<tbody>
           {paginatedInvoices.map((invoice) => (
             <tr key={invoice['@id'].split('/').pop()}>
               <td>{invoice.chrono}</td>
               <td>
-                <a href='#'>
+              <Link to={"/customers/"+invoice.customer['@id'].split('/').pop()}>
                   {invoice.customer.firstName}
                   {invoice.customer.lastName}
-                </a>
+                </Link>
+       
               </td>
               <td className='text-center'>{formatDate(invoice.sentAt)}</td>
               <td className='text-center'>
@@ -134,14 +142,17 @@ const InvoicesPage = (props) => {
               </td>
             </tr>
           ))}
-        </tbody>
+        </tbody>}
       </table>
+      {loading && <TableLoader/> }
+      {itemsPerPage < filteredInvoices.length && (
       <Pagination
         currentPage={currentPage}
         itemsPerPage={itemsPerPage}
         onPageChanged={handlePageChange}
         length={filteredInvoices.length}
-      />
+      />)}
+    
     </>
   )
 }

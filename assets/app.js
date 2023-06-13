@@ -46,7 +46,6 @@ const App = () => {
             <PrivateRoute path='/invoices' component={InvoicesPage} />
             <PrivateRoute path='/customers/:id' component={CustomerPage} />
             <PrivateRoute path='/customers' component={CustomersPage} />
-
             <Route path='/' component={HomePage}></Route>
           </Switch>
         </main>

@@ -4,8 +4,9 @@ import Select from '../components/forms/Select'
 import { Link } from 'react-router-dom'
 import customersAPI from '../services/customersAPI'
 import InvoicesAPI from '../services/invoicesAPI'
+import { toast } from 'react-toastify'
+import FormContentLoader from '../components/loaders/FormContentLoader'
 
-import axios from 'axios'
 const InvoicePage = ({ history, match }) => {
   const { id = 'new' } = match.params
 
@@ -23,44 +24,36 @@ const InvoicePage = ({ history, match }) => {
     customer: '',
     status: '',
   })
+  const [loading, setLoading] = useState(true)
+
   // Récupération des clients
 
   const fetchCustomers = async () => {
     try {
       const data = await customersAPI.findAll()
       setCustomers(data)
+      setLoading(false)
       console.log(data[0]['@id'].split('/').pop())
       if (!invoice.customer)
         setInvoice({ ...invoice, customer: data[0]['@id'].split('/').pop() })
     } catch (error) {
       console.log(error.response)
-      //TODO : Flash notification erreur
+      toast.error('Erreur lors du chargement des clients !')
+
       history.replace('/invoices')
     }
   }
-  /* const fetchInvoice = async () => {
-    try {
-      const data = await axios
-      .get('https://localhost:8000/api/invoices/' + id)
-      .then(response => response.data)
-      const {amount, status , customer} = data;
-      console.log(customer);
-      console.log(customer['@id'].split('/').pop());
 
-     setInvoice({amount,status,customer: customer['@id'].split('/').pop()})
-    } catch (error) {
-      console.log(error.response)
-    }
-  }*/
   const fetchInvoice = async () => {
     console.log(id)
 
     try {
       const { amount, status, customer } = await InvoicesAPI.find(id)
       setInvoice({ amount, status, customer: customer['@id'].split('/').pop() })
+      setLoading(false)
     } catch (error) {
       console.log(error.response)
-      //TODO : Flash notification erreur
+      toast.error('Erreur lors du chargement de la facture !')
       history.replace('/invoices')
     }
   }
@@ -88,11 +81,11 @@ const InvoicePage = ({ history, match }) => {
     event.preventDefault()
     try {
       if (editing) {
-        await InvoicesAPI.update2(id,invoice)
-        //Notif
+        await InvoicesAPI.update2(id, invoice)
+        toast.success('La facture a bien été modifiée')
       } else {
-       await InvoicesAPI.create2(invoice)
-        // TODO ; Flash notification succes
+        await InvoicesAPI.create2(invoice)
+        toast.success('La facture a bien été enregistrée')
         history.replace('/invoices')
         console.log(response)
       }
@@ -104,6 +97,7 @@ const InvoicePage = ({ history, match }) => {
           apiErrors[propertyPath] = message
         })
         setErrors(apiErrors)
+        toast.error('des erreurs dans votre formulaire')
       }
     }
   }
@@ -118,7 +112,9 @@ const InvoicePage = ({ history, match }) => {
       {(editing && <h1>Modification d'une</h1>) || (
         <h1>Création d'une facture</h1>
       )}
-      <form onSubmit={handleSubmit}>
+          {loading &&<FormContentLoader /> }
+
+      {!loading &&<form onSubmit={handleSubmit}>
         <Field
           name='amount'
           type='number'
@@ -163,7 +159,7 @@ const InvoicePage = ({ history, match }) => {
             Retour aux factures
           </Link>
         </div>
-      </form>
+      </form>}
     </>
   )
 }

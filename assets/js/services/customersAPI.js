@@ -9,7 +9,7 @@ function deleteCustomer(id) {
   return axios.delete('https://localhost:8000/api/customers/' + id)
 }
 function find(id) {
-  axios
+  return axios
     .get('https://localhost:8000/api/customers/' + id)
     .then((response) => response.data)
 }
