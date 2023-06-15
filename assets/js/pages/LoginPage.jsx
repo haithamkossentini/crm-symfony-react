@@ -51,6 +51,7 @@ const LoginPage = ({ onLogin, history }) => {
           name='password'
           value={credentials.password}
           onChange={handleChange}
+          type="password"
           error={error}
         />
 
