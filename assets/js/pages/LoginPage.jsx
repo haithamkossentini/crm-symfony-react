@@ -4,8 +4,7 @@ import AuthContext from '../contexts/AuthContext'
 import Field from '../components/forms/Field'
 import { toast } from 'react-toastify'
 
-const LoginPage = ({ onLogin, history }) => {
-  console.log(history)
+const LoginPage = ({ history }) => {
   const { setIsAuthenticated } = useContext(AuthContext)
   const [credentials, setCredentials] = useState({
     username: '',
@@ -30,8 +29,6 @@ const LoginPage = ({ onLogin, history }) => {
     } catch (error) {
       setError('Les informations ne correspondent pas')
       toast.error('Une erreur est survenue')
-
-
     }
   }
   return (
@@ -51,7 +48,7 @@ const LoginPage = ({ onLogin, history }) => {
           name='password'
           value={credentials.password}
           onChange={handleChange}
-          type="password"
+          type='password'
           error={error}
         />
 
