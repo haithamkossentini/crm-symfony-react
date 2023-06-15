@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import Field from '../components/forms/Field'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
+import { toast } from 'react-toastify'
 import UserAPI from '../services/usersAPI'
 
 
@@ -45,16 +46,15 @@ const RegisterPage = ({ history }) => {
     } catch ({ response }) {
       const { violations } = response.data
       if (violations) {
-        violations.forEach((violation) => {
-          apiErrors[violation.propertyPath] = violation.message
+        const apiErrors = {}
+        violations.forEach(({ propertyPath, message }) => {
+          apiErrors[propertyPath] = message
         })
         setErrors(apiErrors)
+        toast.error('des erreurs dans votre formulaire')
       }
-      toast.error('Des erreurs dans votre formulaire')
-
     }
 
-    console.log(user)
   }
   return (
     <>
